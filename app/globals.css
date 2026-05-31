@@ -79,17 +79,17 @@
   }
 
   [data-theme="pastel"] {
-    color-scheme: light;
-    /* Soft cotton candy white background */
-    --ink-950: 252 250 255;
-    --ink-900: 245 242 250;
-    --ink-800: 235 230 245;
-    --ink-700: 220 215 235;
-    --ink-600: 200 195 220;
-    --ink-500: 170 160 190; /* Soft text color */
+    color-scheme: dark;
+    /* Dark Deep Space / Vaporwave background */
+    --ink-950: 5 3 10;
+    --ink-900: 12 8 20;
+    --ink-800: 25 18 40;
+    --ink-700: 40 30 65;
+    --ink-600: 60 50 95;
+    --ink-500: 90 80 135; /* Soft text color */
 
     /* Pastel Rainbow Scale */
-    --gold-50:  60 50 80; /* Dark text */
+    --gold-50:  255 250 255; /* Light text */
     --gold-100: 255 179 186; /* Pastel Pink */
     --gold-200: 255 223 186; /* Pastel Peach/Yellow */
     --gold-300: 186 255 201; /* Pastel Mint */
@@ -281,4 +281,12 @@
 .ring-fg {
   stroke: url(#goldGradient);
   filter: drop-shadow(0 0 8px rgb(var(--gold-400)));
+}
+
+/* Theme Transition */
+html.theme-transitioning, 
+html.theme-transitioning *, 
+html.theme-transitioning *::before, 
+html.theme-transitioning *::after {
+  transition: all 1.5s ease !important;
 }

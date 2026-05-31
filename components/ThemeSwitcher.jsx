@@ -23,10 +23,20 @@ export default function ThemeSwitcher() {
   }, []);
 
   function handleSwitch(newTheme) {
+    if (theme === newTheme) return;
+    
+    // Add transitioning class for 1.5s crossfade
+    document.documentElement.classList.add('theme-transitioning');
+    
     setTheme(newTheme);
     localStorage.setItem('sl_theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     setOpen(false);
+
+    // Remove class after transition completes
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 1500);
   }
 
   return (
