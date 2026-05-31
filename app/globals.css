@@ -80,40 +80,40 @@
 
   [data-theme="pastel"] {
     color-scheme: light;
-    /* Soft lavender/white background */
-    --ink-950: 253 252 255;
-    --ink-900: 246 244 250;
-    --ink-800: 235 231 245;
-    --ink-700: 223 215 236;
-    --ink-600: 201 190 222;
-    --ink-500: 176 161 204; /* Soft text color */
+    /* Soft blue/white background */
+    --ink-950: 250 252 255;
+    --ink-900: 240 245 250;
+    --ink-800: 226 236 245;
+    --ink-700: 204 220 235;
+    --ink-600: 179 201 222;
+    --ink-500: 153 180 207; /* Soft text color */
 
-    /* Soft pink/mint accent */
-    --gold-50:  #4a3f63; /* Dark text */
-    --gold-100: 93 78 122;
-    --gold-200: 243 168 182;
-    --gold-300: 240 149 165;
-    --gold-400: 235 124 144;
-    --gold-500: 224 92 117;
-    --gold-600: 201 64 91;
-    --gold-700: 167 48 72;
-    --gold-800: 138 42 62;
-    --gold-900: 117 39 55;
+    /* Soft pastel blue accent */
+    --gold-50:  33 49 71; /* Dark text */
+    --gold-100: 48 68 94;
+    --gold-200: 168 202 240;
+    --gold-300: 138 185 241;
+    --gold-400: 110 168 242;
+    --gold-500: 89 149 227;
+    --gold-600: 64 124 204;
+    --gold-700: 49 101 173;
+    --gold-800: 38 83 143;
+    --gold-900: 31 68 117;
 
     --font-display: 'Outfit';
     --font-sans: 'Nunito';
 
-    --shadow-gold: 0 0 0 1px rgba(235,124,144,0.25), 0 10px 40px -10px rgba(235,124,144,0.15);
-    --shadow-gold-strong: 0 0 0 1px rgba(235,124,144,0.45), 0 20px 60px -10px rgba(235,124,144,0.35);
+    --shadow-gold: 0 0 0 1px rgba(110,168,242,0.25), 0 10px 40px -10px rgba(110,168,242,0.15);
+    --shadow-gold-strong: 0 0 0 1px rgba(110,168,242,0.45), 0 20px 60px -10px rgba(110,168,242,0.35);
     --shadow-inset-gold: inset 0 1px 0 0 rgba(255,255,255,0.5), inset 0 -1px 0 0 rgba(0,0,0,0.05);
 
     --bg-gold-gradient: linear-gradient(135deg, rgb(var(--gold-300)) 0%, rgb(var(--gold-400)) 35%, rgb(var(--gold-500)) 70%, rgb(var(--gold-300)) 100%);
-    --bg-gold-shine: linear-gradient(120deg, rgba(243,168,182,0) 30%, rgba(243,168,182,0.6) 50%, rgba(243,168,182,0) 70%);
-    --bg-noise: radial-gradient(circle at 20% 10%, rgba(235,124,144,0.05), transparent 40%), radial-gradient(circle at 80% 90%, rgba(235,124,144,0.04), transparent 45%);
-    --bg-body-radial-1: rgba(235,124,144,0.08);
-    --bg-body-radial-2: rgba(201,64,91,0.08);
+    --bg-gold-shine: linear-gradient(120deg, rgba(168,202,240,0) 30%, rgba(168,202,240,0.6) 50%, rgba(168,202,240,0) 70%);
+    --bg-noise: radial-gradient(circle at 20% 10%, rgba(110,168,242,0.05), transparent 40%), radial-gradient(circle at 80% 90%, rgba(110,168,242,0.04), transparent 45%);
+    --bg-body-radial-1: rgba(110,168,242,0.08);
+    --bg-body-radial-2: rgba(64,124,204,0.08);
     
-    --text-selection-bg: rgba(240,149,165,0.3);
+    --text-selection-bg: rgba(138,185,241,0.3);
     --text-selection-fg: #fff;
   }
 
