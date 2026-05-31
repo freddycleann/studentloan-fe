@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 export default function LoginPage() {
   const { login, loading, user } = useAuth();
@@ -29,7 +30,8 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen grid place-items-center px-6 py-12 relative">
-      <div className="absolute top-6 right-6">
+      <div className="absolute top-6 right-6 flex items-center gap-2 z-50">
+        <ThemeSwitcher />
         <div className="flex items-center gap-1 rounded-full border border-gold-400/40 bg-ink-800/90 p-1">
           <button
             onClick={() => setLang('en')}

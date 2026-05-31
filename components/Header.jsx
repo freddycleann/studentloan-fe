@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -22,6 +23,7 @@ export default function Header() {
           </div>
         </Link>
         <nav className="flex items-center gap-2">
+          <ThemeSwitcher />
           <div className="hidden sm:flex items-center gap-1 rounded-full border border-gold-400/40 bg-ink-800/90 p-1">
             <button
               onClick={() => setLang('en')}
