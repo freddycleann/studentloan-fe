@@ -154,7 +154,7 @@ function YearCard({ year, onDelete }) {
     <div className="card card-hover p-6 relative overflow-hidden">
       <div
         className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-30 blur-2xl"
-        style={{ background: 'radial-gradient(circle, #ecc857, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, rgb(var(--gold-400)), transparent 70%)' }}
       />
       <div className="flex items-center justify-between">
         <div className="font-display text-4xl gold-text">{year.year}</div>
