@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html, body {
+    background: #0a0703;
+    color: #fbeec0;
+    min-height: 100vh;
+    font-size: 18px;
+  }
+  body {
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(220,178,64,0.12), transparent 60%),
+      radial-gradient(900px 500px at 100% 110%, rgba(168,122,28,0.12), transparent 60%),
+      #0a0703;
+    background-attachment: fixed;
+    font-family: 'Inter', 'Noto Sans Thai', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(236,200,87,0.45); color: #fff; }
+
+  /* Slightly larger, easier-to-read defaults */
+  p, li, span, div { line-height: 1.6; }
+}
+
+@layer components {
+  /* Strong, readable cards */
+  .card {
+    @apply rounded-2xl border border-gold-400/35 bg-ink-900/95 shadow-gold;
+  }
+  .card-hover {
+    @apply transition hover:border-gold-300/60 hover:shadow-gold-strong;
+  }
+
+  /* Buttons — bigger touch targets, brighter */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold tracking-wide transition focus:outline-none focus:ring-2 focus:ring-gold-300/60 text-base;
+  }
+  .btn-primary {
+    @apply btn bg-gold-gradient text-ink-950 shadow-gold hover:shadow-gold-strong;
+  }
+  .btn-ghost {
+    @apply btn border border-gold-400/50 bg-ink-800/70 text-gold-50 hover:border-gold-300 hover:bg-ink-700/80;
+  }
+  .btn-danger {
+    @apply btn border border-red-400/60 bg-red-950/40 text-red-100 hover:bg-red-900/50;
+  }
+
+  /* Inputs — visible borders, bright text */
+  .input {
+    @apply w-full rounded-xl border border-gold-400/40 bg-ink-800/90 px-4 py-3.5 text-lg text-gold-50 placeholder-gold-100/40 outline-none focus:border-gold-300 focus:ring-2 focus:ring-gold-300/40;
+  }
+  .label {
+    @apply mb-2 block text-sm font-semibold uppercase tracking-[0.15em] text-gold-200;
+  }
+
+  /* Chips — solid background so they're easy to read */
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-gold-400/40 bg-ink-800/90 px-3.5 py-1.5 text-sm font-medium text-gold-50;
+  }
+
+  /* Gold shimmer headlines */
+  .gold-text {
+    background: linear-gradient(135deg, #fdf7e2 0%, #ecc857 35%, #c8992a 70%, #fdf7e2 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 10s linear infinite;
+  }
+
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(220,178,64,0.6), transparent);
+  }
+
+  /* Banner for inline notices */
+  .banner-warn {
+    @apply rounded-xl border border-amber-300/60 bg-amber-900/30 px-4 py-3 text-sm text-amber-100;
+  }
+  .banner-info {
+    @apply rounded-xl border border-gold-400/40 bg-ink-800/90 px-4 py-3 text-sm text-gold-50;
+  }
+}
+
+/* progress ring */
+.ring-bg { stroke: rgba(220,178,64,0.18); }
+.ring-fg {
+  stroke: url(#goldGradient);
+  filter: drop-shadow(0 0 8px rgba(236,200,87,0.6));
+}
