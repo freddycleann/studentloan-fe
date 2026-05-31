@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
 import { I18nProvider } from '@/lib/i18n';
+import ServerAwakeCheck from '@/components/ServerAwakeCheck';
 
 export const metadata = {
   title: 'Student Loan Atelier',
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <I18nProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <ServerAwakeCheck>
+            <AuthProvider>{children}</AuthProvider>
+          </ServerAwakeCheck>
         </I18nProvider>
       </body>
     </html>
