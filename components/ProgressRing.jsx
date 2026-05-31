@@ -18,10 +18,10 @@ export default function ProgressRing({
       <svg width={size} height={size} className="-rotate-90">
         <defs>
           <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fdf7e2" />
-            <stop offset="40%" stopColor="#ecc857" />
-            <stop offset="80%" stopColor="#a87a1c" />
-            <stop offset="100%" stopColor="#fdf7e2" />
+            <stop offset="0%" style={{ stopColor: 'rgb(var(--gold-100))' }} />
+            <stop offset="40%" style={{ stopColor: 'rgb(var(--gold-300))' }} />
+            <stop offset="80%" style={{ stopColor: 'rgb(var(--gold-600))' }} />
+            <stop offset="100%" style={{ stopColor: 'rgb(var(--gold-100))' }} />
           </linearGradient>
         </defs>
         <circle
