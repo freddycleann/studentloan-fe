@@ -73,19 +73,19 @@ export default function HomePage() {
               {t('app_name')}
             </h1>
             <p className="text-xl text-gold-100">
-              The ultimate tool for tracking your student loan volunteering hours and managing your documentation checklists.
+              {t('app_desc')}
             </p>
             
             <div className="card p-8 inline-block max-w-md w-full text-left mx-auto">
               <div className="flex items-center gap-4 mb-4">
                 <div className={`w-3 h-3 rounded-full ${checkingServer ? 'bg-gold-400 animate-pulse' : serverAwake ? 'bg-green-400' : 'bg-red-400'}`} />
                 <span className="font-medium text-gold-50 text-lg">
-                  {checkingServer ? 'Checking server status...' : serverAwake ? 'Server is currently awake' : 'Server is currently asleep'}
+                  {checkingServer ? t('server_checking') : serverAwake ? t('server_awake') : t('server_asleep')}
                 </span>
               </div>
               
               <p className="text-gold-200/80 mb-6 text-sm">
-                {!serverAwake && !checkingServer ? 'If you want to wake up the server, you have to login.' : 'Server is ready to accept requests.'}
+                {!serverAwake && !checkingServer ? t('server_wake_prompt') : t('server_ready')}
               </p>
 
               <div className="space-y-4">
@@ -93,7 +93,7 @@ export default function HomePage() {
                   {t('login')}
                 </Link>
                 <div className="text-center text-xs text-red-300/80 pt-4 border-t border-gold-400/20">
-                  If you don't have an account then you're not my friend.
+                  {t('not_my_friend')}
                 </div>
               </div>
             </div>

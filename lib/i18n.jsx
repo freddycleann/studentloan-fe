@@ -102,6 +102,13 @@ const dict = {
     update_profile: 'Update profile',
     profile_updated: 'Profile updated',
     leave_blank_password: 'Leave blank to keep unchanged',
+    app_desc: 'The ultimate tool for tracking your student loan volunteering hours and managing your documentation checklists.',
+    server_checking: 'Checking server status...',
+    server_awake: 'Server is currently awake',
+    server_asleep: 'Server is currently asleep',
+    server_wake_prompt: 'If you want to wake up the server, you have to login.',
+    server_ready: 'Server is ready to accept requests.',
+    not_my_friend: 'If you don\'t have an account then you\'re not my friend.',
   },
   th: {
     app_name: 'ทุนการศึกษา · บันทึกส่วนตัว',
@@ -203,6 +210,13 @@ const dict = {
     update_profile: 'อัปเดตโปรไฟล์',
     profile_updated: 'อัปเดตโปรไฟล์แล้ว',
     leave_blank_password: 'เว้นว่างไว้หากไม่ต้องการเปลี่ยน',
+    app_desc: 'เครื่องมือที่ดีที่สุดสำหรับการติดตามชั่วโมงจิตอาสากู้ยืมเงินเพื่อการศึกษา และจัดการเช็คลิสต์เอกสารของคุณ',
+    server_checking: 'กำลังตรวจสอบสถานะเซิร์ฟเวอร์...',
+    server_awake: 'เซิร์ฟเวอร์กำลังทำงาน',
+    server_asleep: 'เซิร์ฟเวอร์กำลังหลับ',
+    server_wake_prompt: 'หากคุณต้องการปลุกเซิร์ฟเวอร์ คุณต้องเข้าสู่ระบบ',
+    server_ready: 'เซิร์ฟเวอร์พร้อมรับคำขอแล้ว',
+    not_my_friend: 'ถ้าคุณไม่มีบัญชี แสดงว่าคุณไม่ใช่เพื่อนฉัน',
   },
 };
 
