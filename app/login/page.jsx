@@ -4,6 +4,8 @@ import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 
+import Link from 'next/link';
+
 export default function LoginPage() {
   const { login, loading, user } = useAuth();
   const { t, lang, setLang } = useI18n();
@@ -30,6 +32,10 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen grid place-items-center px-6 py-12 relative">
+      <Link href="/" className="absolute top-6 left-6 text-sm text-gold-200 hover:text-gold-100 flex items-center gap-2 z-50">
+        ← {t('back')}
+      </Link>
+      
       <div className="absolute top-6 right-6 flex items-center gap-2 z-50">
         <ThemeSwitcher />
         <div className="flex items-center gap-1 rounded-full border border-gold-400/40 bg-ink-800/90 p-1">
