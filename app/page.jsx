@@ -18,6 +18,21 @@ export default function HomePage() {
   const [form, setForm] = useState({ year: '', note: '', checklist_url: '', checklist_public_id: '', checklist_type: '' });
   const [err, setErr] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [serverAwake, setServerAwake] = useState(false);
+  const [checkingServer, setCheckingServer] = useState(true);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      let alive = true;
+      setCheckingServer(true);
+      api.health()
+        .then(() => { if (alive) setServerAwake(true); })
+        .catch(() => { if (alive) setServerAwake(false); })
+        .finally(() => { if (alive) setCheckingServer(false); });
+      return () => { alive = false; };
+    }
+  }, [user, loading]);
 
   useEffect(() => {
     if (!user) return;
@@ -46,7 +61,47 @@ export default function HomePage() {
     setYears(prev => prev.filter(y => y.id !== id));
   }
 
-  if (loading || !user) return null;
+  if (loading) return null;
+
+  if (!user) {
+    return (
+      <main className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <div className="max-w-2xl space-y-8">
+            <h1 className="font-display text-5xl md:text-6xl gold-text">
+              {t('app_name')}
+            </h1>
+            <p className="text-xl text-gold-100">
+              The ultimate tool for tracking your student loan volunteering hours and managing your documentation checklists.
+            </p>
+            
+            <div className="card p-8 inline-block max-w-md w-full text-left mx-auto">
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`w-3 h-3 rounded-full ${checkingServer ? 'bg-gold-400 animate-pulse' : serverAwake ? 'bg-green-400' : 'bg-red-400'}`} />
+                <span className="font-medium text-gold-50 text-lg">
+                  {checkingServer ? 'Checking server status...' : serverAwake ? 'Server is currently awake' : 'Server is currently asleep'}
+                </span>
+              </div>
+              
+              <p className="text-gold-200/80 mb-6 text-sm">
+                {!serverAwake && !checkingServer ? 'If you want to wake up the server, you have to login.' : 'Server is ready to accept requests.'}
+              </p>
+
+              <div className="space-y-4">
+                <Link href="/login" className="btn-primary w-full block text-center py-3 text-lg font-medium">
+                  {t('login')}
+                </Link>
+                <div className="text-center text-xs text-red-300/80 pt-4 border-t border-gold-400/20">
+                  If you don't have an account then you're not my friend.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>
