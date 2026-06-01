@@ -127,7 +127,7 @@
     --ink-500: 161 161 170;
 
     /* Monochrome Black/Gray Accents */
-    --gold-50:  255 255 255; /* Light text for buttons */
+    --gold-50:  0 0 0;       /* Darkest text */
     --gold-100: 10 10 10;    /* Main text */
     --gold-200: 23 23 23;    /* Hover */
     --gold-300: 38 38 38;    /* Accents */
