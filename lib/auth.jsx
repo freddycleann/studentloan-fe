@@ -39,7 +39,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (loading) return;
     const isLogin = pathname === '/login';
-    if (!user && !isLogin) router.replace('/login');
+    const isHome = pathname === '/';
+    if (!user && !isLogin && !isHome) router.replace('/login');
     if (user && isLogin) router.replace('/');
   }, [user, loading, pathname, router]);
 
