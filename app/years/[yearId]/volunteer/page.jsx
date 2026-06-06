@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -32,6 +32,13 @@ export default function VolunteerPage({ params }) {
   const [saveErr, setSaveErr] = useState('');
   const [saving, setSaving] = useState(false);
   const [merging, setMerging] = useState(false);
+
+  // Bulk upload state
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [queue, setQueue] = useState([]);
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkResult, setBulkResult] = useState(null);
+  const bulkInputRef = useRef(null);
 
   function emptyForm() {
     return {
@@ -150,6 +157,114 @@ export default function VolunteerPage({ params }) {
     await reload();
   }
 
+  function openBulk() {
+    setQueue([]);
+    setBulkResult(null);
+    setBulkOpen(true);
+  }
+
+  async function handleBulkPick(fileList) {
+    if (!fileList || fileList.length === 0) return;
+    const files = Array.from(fileList);
+    const stamp = Date.now();
+    const seeded = files.map((file, idx) => ({
+      qid: `${stamp}-${idx}`,
+      file,
+      file_name: file.name,
+      status: 'pending',
+      cert_url: '',
+      cert_public_id: '',
+      cert_type: '',
+      entry_date: today(),
+      hours: '1',
+      kind: 'elearning',
+      title: '',
+      notes: '',
+      error: '',
+    }));
+    setQueue(prev => [...prev, ...seeded]);
+
+    for (const item of seeded) {
+      setQueue(prev => prev.map(q => q.qid === item.qid ? { ...q, status: 'uploading' } : q));
+      try {
+        const r = await api.upload(item.file, `volunteer/year-${yearId}`);
+        const code = extractCertCode(r.original_name);
+        setQueue(prev => prev.map(q => q.qid === item.qid ? {
+          ...q,
+          status: 'ready',
+          cert_url: r.url,
+          cert_public_id: r.public_id,
+          cert_type: r.type,
+          entry_date: r.date || q.entry_date,
+          hours: r.hours ? String(r.hours) : q.hours,
+          title: code || stripExt(item.file_name),
+        } : q));
+      } catch (e) {
+        setQueue(prev => prev.map(q => q.qid === item.qid ? {
+          ...q, status: 'error', error: e.message || 'Upload failed',
+        } : q));
+      }
+    }
+    if (bulkInputRef.current) bulkInputRef.current.value = '';
+  }
+
+  function updateQueueRow(qid, patch) {
+    setQueue(prev => prev.map(q => q.qid === qid ? { ...q, ...patch } : q));
+  }
+  function removeQueueRow(qid) {
+    setQueue(prev => prev.filter(q => q.qid !== qid));
+  }
+
+  function isQueueDuplicate(item, allQueue) {
+    if (item.kind !== 'elearning') return false;
+    const myCode = extractCertCode(item.file_name);
+    const myTitle = (item.title || '').trim().toLowerCase();
+    for (const e of entries) {
+      if (e.kind !== 'elearning') continue;
+      const eCode = e.cert_url ? extractCertCode(e.cert_url) : null;
+      if (myCode && eCode && myCode.toLowerCase() === eCode.toLowerCase()) return true;
+      if (myTitle && e.title.trim().toLowerCase() === myTitle) return true;
+    }
+    for (const q of allQueue) {
+      if (q.qid === item.qid || q.kind !== 'elearning') continue;
+      const qCode = extractCertCode(q.file_name);
+      if (myCode && qCode && myCode.toLowerCase() === qCode.toLowerCase()) return true;
+      if (myTitle && (q.title || '').trim().toLowerCase() === myTitle) return true;
+    }
+    return false;
+  }
+
+  async function saveBulkAll() {
+    const ready = queue.filter(q => q.status === 'ready');
+    if (ready.length === 0) return;
+    setBulkSaving(true);
+    let saved = 0, skipped = 0;
+    for (const item of ready) {
+      const h = Number(item.hours);
+      if (!item.title.trim() || !Number.isFinite(h) || h <= 0) { skipped++; continue; }
+      if (isQueueDuplicate(item, queue)) { skipped++; continue; }
+      try {
+        await api.volunteer.create(yearId, {
+          entry_date: item.entry_date,
+          hours: h,
+          kind: item.kind,
+          title: item.title.trim(),
+          notes: item.notes || '',
+          cert_url: item.cert_url || '',
+          cert_public_id: item.cert_public_id || '',
+          cert_type: item.cert_type || '',
+        });
+        saved++;
+      } catch {
+        skipped++;
+      }
+    }
+    setBulkResult({ saved, skipped });
+    setBulkSaving(false);
+    setQueue([]);
+    await reload();
+  }
+
   async function downloadMergedPdfs() {
     setMerging(true);
     try {
@@ -190,6 +305,7 @@ export default function VolunteerPage({ params }) {
             >
               {merging ? t('merging') : t('merge_pdfs')}
             </button>
+            <button onClick={openBulk} className="btn-ghost">⇪ {t('bulk_upload')}</button>
             <button onClick={openCreate} className="btn-primary">+ {t('add_entry')}</button>
           </div>
         </div>
@@ -425,8 +541,194 @@ export default function VolunteerPage({ params }) {
       >
         {viewing && <PdfViewer url={viewing.cert_url} />}
       </Modal>
+
+      <Modal
+        open={bulkOpen}
+        onClose={() => !bulkSaving && setBulkOpen(false)}
+        title={t('bulk_upload_title')}
+        wide
+        footer={
+          <>
+            <button onClick={() => setBulkOpen(false)} className="btn-ghost" disabled={bulkSaving}>
+              {t('cancel')}
+            </button>
+            <button
+              onClick={() => setQueue([])}
+              className="btn-ghost"
+              disabled={bulkSaving || queue.length === 0}
+            >
+              {t('clear_queue')}
+            </button>
+            <button
+              onClick={saveBulkAll}
+              disabled={bulkSaving || queue.filter(q => q.status === 'ready').length === 0}
+              className="btn-primary disabled:opacity-50"
+            >
+              {bulkSaving ? t('processing') : `${t('save_all')} (${queue.filter(q => q.status === 'ready').length})`}
+            </button>
+          </>
+        }
+      >
+        <BulkPicker
+          inputRef={bulkInputRef}
+          onPick={handleBulkPick}
+          hint={t('bulk_upload_hint')}
+          pickLabel={t('pick_files')}
+          disabled={bulkSaving}
+        />
+
+        {queue.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
+            <span className="chip">{t('n_in_queue').replace('{n}', queue.length)}</span>
+            {queue.some(q => q.status === 'uploading') && (
+              <span className="chip border-gold-300/60">
+                {t('n_uploading').replace('{n}', queue.filter(q => q.status === 'uploading').length)}
+              </span>
+            )}
+            {queue.some(q => q.status === 'ready') && (
+              <span className="chip border-emerald-400/60 text-emerald-100">
+                {t('n_ready').replace('{n}', queue.filter(q => q.status === 'ready').length)}
+              </span>
+            )}
+            {queue.some(q => q.status === 'error') && (
+              <span className="chip border-red-400/60 text-red-200">
+                {t('n_failed').replace('{n}', queue.filter(q => q.status === 'error').length)}
+              </span>
+            )}
+          </div>
+        )}
+
+        {bulkResult && (
+          <div className="mt-4 rounded-xl border border-emerald-400/60 bg-emerald-950/30 px-4 py-2.5 text-sm text-emerald-100">
+            ✓ {t('bulk_result_msg').replace('{saved}', bulkResult.saved).replace('{skipped}', bulkResult.skipped)}
+          </div>
+        )}
+
+        <div className="mt-4 max-h-[55vh] overflow-y-auto pr-1">
+          {queue.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gold-400/30 bg-ink-800/40 px-4 py-8 text-center text-sm text-gold-200/80">
+              {t('bulk_queue_empty')}
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {queue.map(item => {
+                const dup = item.status === 'ready' && isQueueDuplicate(item, queue);
+                return (
+                  <li
+                    key={item.qid}
+                    className={`rounded-xl border bg-ink-900/70 p-3 ${
+                      item.status === 'error'
+                        ? 'border-red-400/50'
+                        : dup
+                          ? 'border-amber-400/50'
+                          : 'border-gold-400/25'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 flex-wrap text-xs">
+                      <StatusDot status={item.status} />
+                      <span className="font-mono truncate max-w-[280px] text-gold-100" title={item.file_name}>
+                        {item.file_name}
+                      </span>
+                      {dup && <span className="chip border-amber-400/60 text-amber-100">⚠ {t('duplicate_label')}</span>}
+                      {item.status === 'error' && (
+                        <span className="text-red-200">⚠ {item.error || t('failed_to_upload')}</span>
+                      )}
+                      <button
+                        onClick={() => removeQueueRow(item.qid)}
+                        disabled={bulkSaving}
+                        className="ml-auto text-gold-200/60 hover:text-red-300"
+                        title={t('remove')}
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {item.status === 'ready' && (
+                      <div className="mt-3 grid gap-2 md:grid-cols-12">
+                        <input
+                          type="date"
+                          className="input md:col-span-3 py-2 text-sm"
+                          value={item.entry_date}
+                          onChange={e => updateQueueRow(item.qid, { entry_date: e.target.value })}
+                        />
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="24"
+                          className="input md:col-span-2 py-2 text-sm"
+                          value={item.hours}
+                          onChange={e => updateQueueRow(item.qid, { hours: e.target.value })}
+                          placeholder="h"
+                        />
+                        <select
+                          className="input md:col-span-2 py-2 text-sm"
+                          value={item.kind}
+                          onChange={e => updateQueueRow(item.qid, { kind: e.target.value })}
+                        >
+                          <option value="elearning">{t('type_elearning_short')}</option>
+                          <option value="realworld">{t('type_realworld_short')}</option>
+                        </select>
+                        <input
+                          className="input md:col-span-5 py-2 text-sm"
+                          value={item.title}
+                          onChange={e => updateQueueRow(item.qid, { title: e.target.value })}
+                          placeholder={t('title')}
+                        />
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </Modal>
     </main>
   );
+}
+
+function BulkPicker({ inputRef, onPick, hint, pickLabel, disabled }) {
+  const [over, setOver] = useState(false);
+  return (
+    <label
+      onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault(); setOver(false);
+        if (!disabled) onPick(e.dataTransfer.files);
+      }}
+      className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-ink-800/60 px-4 py-6 text-center transition ${
+        over ? 'border-gold-300 bg-ink-800/90' : 'border-gold-400/40 hover:border-gold-300/70'
+      } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf,.pdf"
+        multiple
+        className="hidden"
+        disabled={disabled}
+        onChange={(e) => onPick(e.target.files)}
+      />
+      <div className="font-display text-lg gold-text">⇪ {pickLabel}</div>
+      <div className="text-xs text-gold-200/80 max-w-md">{hint}</div>
+    </label>
+  );
+}
+
+function StatusDot({ status }) {
+  const colors = {
+    pending: 'bg-gold-200/50',
+    uploading: 'bg-gold-300 animate-pulse',
+    ready: 'bg-emerald-400',
+    error: 'bg-red-400',
+  };
+  return <span className={`inline-block h-2.5 w-2.5 rounded-full ${colors[status] || 'bg-gold-200'}`} />;
+}
+
+function stripExt(name) {
+  return (name || '').replace(/\.[^.]+$/, '');
 }
 
 function Row({ label, value }) {
